@@ -24,3 +24,4 @@ print("Predictions ready.")
 from sklearn.metrics import accuracy_score
 error = accuracy_score(test_y, predictions)
 error
+# %%

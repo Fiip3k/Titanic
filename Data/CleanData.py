@@ -1,9 +1,9 @@
 # %% Read data from files
 
 import pandas as pd
-test_data = pd.read_csv('test.csv', index_col=0)
+test_data = pd.read_csv('CSV\\test.csv', index_col=0)
 test_full = test_data.copy()
-train_data = pd.read_csv('train.csv', index_col=0)
+train_data = pd.read_csv('CSV\\train.csv', index_col=0)
 train_full = train_data.copy()
 print("Data loaded.")
 
@@ -28,12 +28,12 @@ print("\"Name\" column dropped.")
 # %% LE "Sex" column (probably should OHE)
 
 from sklearn.preprocessing import LabelEncoder
-le = LabelEncoder()
-X["Sex"] = le.fit_transform(X["Sex"])
-test_full["Sex"] = le.transform(test_full["Sex"])
+#le = LabelEncoder()
+#X["Sex"] = le.fit_transform(X["Sex"])
+#test_full["Sex"] = le.transform(test_full["Sex"])
+
 
 # %% Fix NaN in "Age" column (Simple Impute -> terrible decision xD) 
-# X["Age"].isna().sum() = 177
 print("Making a terrible decision.")
 
 X["Age"].fillna(X["Age"].mean(), inplace=True)
@@ -53,17 +53,14 @@ X["Fare"].isna().sum()
 print("\"Fare\" is cool.")
 test_full["Fare"].fillna(test_full["Fare"].mean(), inplace = True)
 
-# %% Fix NaN in "Cabin" names
-
-#X["Cabin"].fillna("N", inplace=True)
-#test_full["Cabin"].fillna("N", inplace=True)
-#print("NaN replaced.")
-
 # %% Create "Deck" feature from "Cabin" column
 
+le = LabelEncoder()
 X["Deck"] = X["Cabin"].str[0]
-X["Deck"] = le.fit_transform(X["Deck"])
+#X["Deck"] = le.fit_transform(X["Deck"])
 test_full["Deck"] = test_full["Cabin"].str[0]
+#test_full["Deck"] = le.transform(test_full["Deck"])
+
 print("\"Deck\" feature created.")
 
 # %% Drop "Cabin" column
@@ -74,9 +71,21 @@ test_full = test_full.drop("Cabin", axis = 1)
 X = X.drop("Embarked", axis = 1)
 test_full = test_full.drop("Embarked", axis = 1)
 
-# %% Drop "Deck" column
-#X = X.drop("Deck", axis = 1)
-test_full = test_full.drop("Deck", axis = 1)
+# %% OHE remaining object columns
+
+from sklearn.preprocessing import OneHotEncoder
+
+object_cols = ["Sex", "Deck"]
+ohe = OneHotEncoder(handle_unknown = "ignore", sparse = False)
+OH_data = pd.DataFrame(ohe.fit_transform(X[object_cols]))
+OH_data.columns = ohe.get_feature_names(object_cols)
+OH_data.index = X.index
+
+X = X.drop(object_cols, axis=1)
+X = pd.concat([X, OH_data], axis=1)
+
+# %%
+X
 
 # %% Normalize columns
 
@@ -87,3 +96,7 @@ scaler = MinMaxScaler()
 numpy_data = scaler.fit_transform(numpy_data)
 X = pd.DataFrame(numpy_data)
 X.columns = column_names
+
+print("Data normalized.")
+X
+# %%
