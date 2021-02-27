@@ -1,0 +1,2 @@
+- draw over/underfitting
+- sampling to balance classes
