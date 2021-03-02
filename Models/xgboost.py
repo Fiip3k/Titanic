@@ -1,4 +1,10 @@
 ### RUN CleanData.py
+# %% Undersampling TomekLinks
+
+from imblearn.over_sampling import SMOTE
+
+smote = SMOTE(sampling_strategy="auto", k_neighbors=10, n_jobs=6)
+XR, yR = smote.fit_resample(X, y)
 
 # %% Split data for validation
 from sklearn.model_selection import train_test_split
@@ -24,4 +30,5 @@ print("Predictions ready.")
 from sklearn.metrics import accuracy_score
 error = accuracy_score(test_y, predictions)
 error
+
 # %%

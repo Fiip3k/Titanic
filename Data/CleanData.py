@@ -27,7 +27,7 @@ print("\"Name\" column dropped.")
 
 # %% LE "Sex" column (probably should OHE)
 
-from sklearn.preprocessing import LabelEncoder
+#from sklearn.preprocessing import LabelEncoder
 #le = LabelEncoder()
 #X["Sex"] = le.fit_transform(X["Sex"])
 #test_full["Sex"] = le.transform(test_full["Sex"])
@@ -84,10 +84,22 @@ OH_data.index = X.index
 X = X.drop(object_cols, axis=1)
 X = pd.concat([X, OH_data], axis=1)
 
-# %%
-X
+OH_data = pd.DataFrame(ohe.fit_transform(test_full[object_cols]))
+OH_data.columns = ohe.get_feature_names(object_cols)
+OH_data.index = test_full.index
+test_full = test_full.drop(object_cols, axis=1)
+test_full = pd.concat([test_full, OH_data], axis=1)
+
+# %% Drop "Deck_nan" column
+
+X = X.drop("Deck_nan", axis=1)
+test_full = test_full.drop("Deck_nan", axis=1)
+
 
 # %% Normalize columns
+
+# Temporary drop "Deck_T" TODO
+X = X.drop("Deck_T", axis=1)
 
 from sklearn.preprocessing import MinMaxScaler
 column_names = X.columns
@@ -97,6 +109,13 @@ numpy_data = scaler.fit_transform(numpy_data)
 X = pd.DataFrame(numpy_data)
 X.columns = column_names
 
+column_names = test_full.columns
+numpy_data = test_full.values
+numpy_data = scaler.transform(numpy_data)
+test_full = pd.DataFrame(numpy_data)
+test_full.columns = column_names
+
+
+
 print("Data normalized.")
-X
 # %%
